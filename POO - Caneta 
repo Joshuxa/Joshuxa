@@ -1,0 +1,64 @@
+class caneta:
+    def __init__(self, cor='Azul', tampada=True):
+        cores = {
+            'Preto': '\033[30m', 'Vermelho': '\033[31m', 'Verde': '\033[32m',
+            'Amarelo': '\033[33m', 'Azul': '\033[34m', 'Magenta': '\033[35m',
+            'Ciano': '\033[36m', 'Cinza': '\033[37m'
+        }
+        self.cores = cores
+        nome_cor = cor[:]
+        self.nome_cor = nome_cor
+        self.tampada = tampada
+
+        if cor not in self.cores.keys():
+            while True:
+                corr_cor = str(input('Digite uma cor válida '))
+                if corr_cor not in self.cores.keys():
+                    continue
+                else:
+                    break
+        else:
+            pass
+
+        self.cor = cores[f'{cor}']
+
+    def trocar_cor(self, cor):
+        try:
+            self.cor = self.cores[f'{cor}']
+            self.nome_cor = cor
+        except:
+            print('Digite uma cor válida!')
+        else:
+            print(f'A cor foi trocada para {cor}')
+
+    def escrever(self, txt):
+        if self.tampada:
+            print('A caneta está tampada')
+        else:
+            print(f'{self.cor}{txt}\033[m')
+
+    def tampar(self):
+        if self.tampada:
+            print('A caneta já está tampada')
+        else:
+            print('A caneta foi tampada')
+            self.tampada = True
+
+    def destampar(self):
+        if self.tampada == False:
+            print('A caneta já está destampada')
+        else:
+            print('A caneta foi destampada')
+            self.tampada = False
+
+    def status(self):
+        if self.tampada == True:
+            print('A caneta está tampada')
+        else:
+            print('A caneta está destampada')
+        print(f'{self.cor}A cor de sua caneta é {self.nome_cor}\033[m')
+
+    def mostrar_cores(self):
+        print(f'As cores disponíveis são:')
+        for k, v in self.cores.items():
+            print(f'{v}{k}\033[m')
