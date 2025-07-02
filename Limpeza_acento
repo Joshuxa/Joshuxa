@@ -1,0 +1,21 @@
+def remover_assento(termo):
+    var_as = ['à', 'á', 'â', 'ä', 'æ', 'ã', 'å', 'ā', 'a']
+    var_es = ['é', 'è', 'ê', 'ë', 'ē', 'e']
+    var_is = ['í', 'î', 'ì', 'į', 'ï', 'ī', 'i']
+    var_os = ['ó', 'õ', 'ô', 'ò', 'ö', 'œ', 'ø', 'ō', 'º', 'o']
+    var_us = ['ú', 'ü', 'û', 'ù', 'ū', 'u']
+    var_alfas = [var_as, var_es, var_is, var_os, var_us]
+    
+    for listas in var_alfas:
+        for item in listas:
+            if item in termo:
+                termo = termo.replace(item, listas[-1])
+            else:
+                pass
+                
+    return termo 
+                
+        
+palavra = str(input('Digite uma palavra')).lower()
+palavra = remover_assento(palavra)
+print(palavra)
