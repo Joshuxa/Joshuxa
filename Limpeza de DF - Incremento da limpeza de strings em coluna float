@@ -1,0 +1,55 @@
+import pandas as pd
+import numpy as np
+import unicodedata
+
+def remover_acentos(texto):
+    return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
+
+df_loja_sujo = pd.DataFrame({
+    ' produto ': [
+        ' Camisa polo  ', 'CALÇA JEANS', 'Tênis esportivo', None, '  MEIA branca',
+        'Jaqueta   Couro', 'Boné    Snapback', 'sapato SOCIAL', 'Short jeans', 'cinto couro',
+        'CAMISETA básica ', 'Chinelo praia  ', 'Regata-Esportiva', 'cueca Box', 'Sunga PRAIA',
+        ' bermuda Tactel ', 'Tenis casual', 'blusa lã', 'Touca preta', 'Gravata-lisa'
+    ],
+    'preco(R$)': [
+        '59,90', '120,00', '220.00', 'R$ 49,90', 8.99,
+        '299,90', 'R$ 45', 189.99, 'R$ 79.90', 35,
+        '29.99', '25,00', np.nan, 'R$ 12.50', 'R$19,99',
+        55.00, 'R$199.99', None, 'R$ 15', '22,00'
+    ],
+    ' Categoria': [
+        ' MODA masculina ', 'Moda masculina', 'CALÇADOS', 'Moda Masculina', 'Moda UNISSEX',
+        'Moda   masculina', 'Moda UNISSEX', 'calçados', 'Moda UNISSEX', 'acessórios',
+        'moda masculina', 'Calçados', 'MODA UNISSEX', 'moda masculina', 'Moda Praia',
+        'Moda Masculina', 'calçados', 'Moda Inverno', ' acessórios', 'ACESSÓRIOS'
+    ]
+})
+
+df_loja_sujo.rename(columns={' produto ': 'Produto', 'preco(R$)': 'Preço', ' Categoria': 'Categoria'}, inplace=True)
+
+df_loja_sujo['Produto'] = df_loja_sujo['Produto'].fillna('Desconhecido')
+
+df_loja_sujo['Produto'] = df_loja_sujo['Produto'].str.strip().str.title()
+
+df_loja_sujo['Produto'] = df_loja_sujo['Produto'].str.split().str.join(' ')
+
+df_loja_sujo['Preço'] = df_loja_sujo['Preço'].astype(str).str.replace(r'R\$', '', regex=True).replace('None', np.nan).replace('NaN', np.nan).str.replace(',' , '.').astype(float)
+
+media = df_loja_sujo['Preço'].mean()
+
+df_loja_sujo['Preço'] = df_loja_sujo['Preço'].fillna(media)
+
+df_loja_sujo['Categoria'] = df_loja_sujo['Categoria'].str.strip().str.title().apply(remover_acentos)
+
+df_loja_sujo['Categoria'] = df_loja_sujo['Categoria'].str.split().str.join(' ')
+
+df_loja_sujo[df_loja_sujo['Produto'].str.contains('praia', case=False)]
+
+df_loja_sujo[df_loja_sujo['Produto'].str.len() > 14]
+
+df_loja_sujo[df_loja_sujo['Categoria'] != 'Calcados']
+
+df_loja_sujo[df_loja_sujo['Produto'].str.startswith(('Camisa', 'Calça', 'Camiseta'))]
+
+print(df_loja_sujo)
