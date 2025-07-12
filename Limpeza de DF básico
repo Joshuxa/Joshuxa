@@ -1,0 +1,56 @@
+import pandas as pd
+import numpy as np
+import unicodedata
+
+def remover_acentos(texto):
+    return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
+
+df_caos_loja = pd.DataFrame({
+    'produto': [
+        ' camisa polo ', 'Calça jeans', 'TÊNIS esportivo', 'camiseta Estampada', 'MEIA branca',
+        'jaqueta couro', None, 'SAPATO social', 'Short jeans', ' cinto de Couro ',
+        'CAMISETA básica', 'chinelo PRAIA', 'Regata Esportiva', 'cueca Box', 'Sunga praia',
+        'bermuda tactel', 'Tênis casual', 'blusa de lã', ' Touca preta', 'Gravata lisa'
+    ],
+    'preço': [
+        59.9, 120, 220, 49.90, 8.99,
+        299.9, 45.00, 189.99, 'R$ 79.90', 35,
+        29.99, 25.0, np.nan, 12.50, 'R$19.99',
+        55.00, 199.99, None, 15.00, 22.00
+    ],
+    'categoria': [
+        ' MODA masculina ', 'Moda masculina', 'CALÇADOS', 'Moda Masculina', 'Moda unissex',
+        'Moda masculina', 'Moda unissex', 'calçados', 'Moda Unissex', 'acessórios',
+        'moda masculina', 'Calçados', 'MODA UNISSEX', 'moda masculina', 'Moda Praia',
+        'Moda Masculina', 'calçados', 'Moda Inverno', 'acessórios ', 'ACESSÓRIOS'
+    ]
+})
+
+df_caos_loja.rename(columns={'produto': 'Produto', 'preço': 'Preço', 'categoria': 'Categoria'}, inplace=True)
+
+df_caos_loja['Produto'] = df_caos_loja['Produto'].str.strip().str.title()
+
+df_caos_loja['Categoria'] = df_caos_loja['Categoria'].str.title().str.strip()
+
+df_caos_loja['Categoria'] = df_caos_loja['Categoria'].apply(remover_acentos)
+
+df_caos_loja['Preço'] = (
+    df_caos_loja['Preço']
+    .astype(str)
+    .str.replace(r'R\$', '', regex=True)
+    .replace('None', np.nan)
+    .replace('nan', np.nan)
+    .astype(float)
+)
+
+media = df_caos_loja['Preço'].mean()
+
+df_caos_loja['Preço'] = df_caos_loja['Preço'].fillna(media)
+
+df_caos_loja['Produto'] = df_caos_loja['Produto'].fillna('Desconhecido')
+
+df_caos_loja[df_caos_loja['Produto'].str.contains('praia', case=False)]
+
+df_caos_loja[df_caos_loja['Produto'].str.len() > 12]
+
+print(df_caos_loja[df_caos_loja['Categoria'].isin(['Acessorios'])])
