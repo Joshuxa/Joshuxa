@@ -1,0 +1,53 @@
+import pandas as pd
+import numpy as np
+import unicodedata
+
+def remover_acentos(texto):
+    return unicodedata.normalize('NFKD', texto).encode('ASCII', 'ignore').decode('utf-8')
+
+
+df_fashion_caos = pd.DataFrame({
+    ' Produto ': [
+        ' Camiseta básica  ', 'Calça Jeans', ' TÊNIS  esportivo', 'camisa Polo', ' MEIA branca',
+        None, 'Jaqueta   Couro', 'Boné Snapback', 'SAPATO SOCIAL', 'Short jeans',
+        'Camisa Regata', 'chinelo praia', 'Regata  esportiva', 'cueca box', 'Sunga PRAIA',
+        'Bermuda tactel', 'Tênis casual', 'Blusa lã', 'touca Preta ', 'gravata LISA'
+    ],
+    'preco(R$)': [
+        'R$ 59,90', '120.00', 'R$220.00', 49.90, 8.99,
+        'None', '299.9000', 'R$45', 'R$ 189,99', 35,
+        'R$29.99', '25,00', np.nan, 'R$ 12.50', 'R$19,99',
+        55.00, 'R$ 199.99', None, 'R$15,00', '0.00000001'
+    ],
+    ' categoria ': [
+        ' Moda Masculina ', 'moda   masculina', 'CALÇADOS', 'Moda Masculina', 'MODA unissex',
+        'Moda masculina', 'Moda   masculina', 'Moda unissex', 'CALÇADOS', 'MODA unissex',
+        'moda   regata', 'Calçados', 'MODA esportiva', 'moda masculina', 'Moda Praia',
+        'Moda masculina', 'CALÇADOS', 'Moda Inverno', ' acessórios', 'ACESSÓRIOS'
+    ]
+})
+
+df_fashion_caos.rename(columns={' Produto ': 'Produto', 'preco(R$)': 'Preço', ' categoria ': 'Categoria'}, inplace=True)
+
+df_fashion_caos['Produto'] = df_fashion_caos['Produto'].str.title().str.strip().str.split().str.join(' ').fillna('Desconhecido')
+
+df_fashion_caos['Preço'] = df_fashion_caos['Preço'].astype(str).str.replace(r'R\$', '', regex=True).str.replace(',', '.').replace('None', np.nan).replace('nan', np.nan).astype(float)
+
+media = df_fashion_caos['Preço'].mean()
+
+df_fashion_caos['Preço'] = df_fashion_caos['Preço'].fillna(media)
+
+df_fashion_caos['Categoria'] = df_fashion_caos['Categoria'].str.strip().str.title().str.split().str.join(' ').apply(remover_acentos)
+
+df_fashion_caos['Faixa de Preço'] = np.where(df_fashion_caos['Preço']>150, 'Caro',np.where(df_fashion_caos['Preço']>50, 'Médio', 'Barato'))
+
+
+#print(df_fashion_caos['Faixa de Preço'].value_counts())
+
+#print(df_fashion_caos['Preço'].apply(lambda x: f'R${x:.2f}'))
+
+#print(df_fashion_caos[df_fashion_caos['Produto'].str.len() > 15])
+
+#print(df_fashion_caos[df_fashion_caos['Produto'].str.startswith(('Camisa', 'Calça'))])
+
+#print(df_fashion_caos[df_fashion_caos['Categoria'] != 'Calcados'])
